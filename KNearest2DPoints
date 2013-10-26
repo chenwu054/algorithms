@@ -1,0 +1,79 @@
+/*
+  1.convert all the x and y coordinates into points and calculate the distance to the origin.
+  2.use the first point in the valid range to partition the group.
+  3.return k points if pivot is right at k-1(index)
+  4.otherwise repeat step 2.
+  
+  Node: "end" is always the right position for the pivot. 
+*/
+public class KNearest2DPoint {
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		double[] x={2,1,3,3,1,0.6,12,2,2.5};
+		double[] y={2,1,3,4,5,7,0.1,2.5,4};
+		ArrayList<Point> ret = kNearestPoints(x,y,5);
+		for(Point p : ret){
+			System.out.println(p);
+		}
+	}	
+	static class Point{
+		double x,y;
+		double dist;
+		public Point(double x,double y){
+			this.x=x;
+			this.y=y;
+			this.dist=Math.sqrt(x*x + y*y);
+		}
+		public String toString(){
+			return "("+x+":"+y+")";
+		}
+	}
+	public static ArrayList<Point> kNearestPoints(double[] x, double[] y,int k){
+		assert(x!=null&&y!=null && x.length==y.length&&x.length>0);
+		ArrayList<Point> ret =new ArrayList<Point>();
+		ArrayList<Point> points= new ArrayList<Point>();
+		for(int i=0;i<x.length;i++)
+			points.add(new Point(x[i],y[i]));
+		int start=0,end=points.size()-1;
+		//high and low are the upper and lower boundaries of valid range.
+		int low = 0,high=points.size()-1;
+		while(true){
+			low=start;
+			high=end;
+			Point pivot=points.get(start);
+			start++;
+			while(start<=end){
+				//everything before start-1 are less than pivot after this.
+				//start-1 is copied to start-2;
+				while(start<=end && points.get(start).dist< pivot.dist){
+					points.set(start-1,points.get(start));
+					start++;
+				}
+				while(start<=end && points.get(end).dist>pivot.dist){
+					end--;
+				}
+				if(start<=end){
+					Point temp = points.get(start);
+					points.set(start,points.get(end));
+					points.set(end,temp);
+					end--;
+				}
+			}
+			//end is always the correct position for pivot;
+			points.set(end,pivot);
+			if(end==k-1){
+				for(int i=0;i<=end;i++)
+					ret.add(points.get(i));
+				return ret;
+			}
+			else if(end>k-1){
+				end=end-1;
+				start=low;
+			}
+			else{
+				start=end+1;
+				end=high;
+			}
+		}
+	}
+}
