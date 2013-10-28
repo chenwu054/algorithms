@@ -1,0 +1,61 @@
+/*
+  public class ListNode {
+    public int val;
+    public ListNode next;
+}
+*/
+
+public class LinkListSort {
+    public void merge(ListNode head,int len,ListNode[] last){
+        if(len<1)
+            return;
+        if(len==1){
+            last[0]=head.next;
+            return;
+        }
+        int mid = len/2;
+        merge(head,mid,last);
+        ListNode list2 = last[0];
+        merge(list2,len-mid,last);
+        ListNode tail = last[0].next;
+        last[0].next=null;
+        ListNode node2=list2.next;
+        list2.next=null;
+        ListNode node1=head.next;
+        ListNode node=head;
+        while(node1!=null && node2!=null){
+            if(node1.val<node2.val){
+                node.next=node1;
+                node1=node1.next;
+            }
+            else{
+                node.next=node2;
+                node2=node2.next;
+            }
+            node=node.next;
+        } 
+        node.next=node1==null?node2:node1;
+        
+        while(node.next!=null){
+            node=node.next;
+        }
+        node.next=tail;
+        last[0]=node;        
+    }
+    public ListNode sort(ListNode head) {
+        if(head==null)
+            return null;
+        ListNode node=head;
+        ListNode newHead=new ListNode();
+        newHead.next=head;
+        int length=0;
+        while(node!=null){
+            length++;
+            node=node.next;
+        }
+        ListNode[] last=new ListNode[1];
+        last[0]=head;
+        merge(newHead,length,last);
+        return newHead.next;
+    }
+}
