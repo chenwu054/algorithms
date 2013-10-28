@@ -1,0 +1,52 @@
+/*
+  quick sort linkedlist
+*/
+
+class ListNode{
+	int val;
+	ListNode next;
+	public ListNode(int v){
+		this.val=v;
+		this.next=null;
+	}
+}
+public  sortHelper(ListNode last, ListNode next){
+	if(last==next||last.next==next)
+		return ;
+	ListNode pivot=last.next;
+	if(pivot.next=next)
+		return;
+	ListNode lessNode=new ListNode(0);
+	ListNode moreNode=new ListNode(0);
+	ListNode less=lessNode,more=moreNode;
+	ListNode node=pivot.next;
+	pivot.next=null;
+	while(node!=next){
+		if(node.val<pivot.val){
+			less.next=node;
+			less=less.next;
+		}
+		else{
+			more.next=node;
+			more=more.next;
+		}
+		node=node.next;
+	}
+	less.next=pivot;
+	pivot.next=moreNode.next;
+	last.next=lessNode.next;
+	if(more==moreNode)
+		pivot.next=next;
+	else
+		more.next=next;
+	sortHelper(last,pivot);
+	sortHelper(pivot,next);
+}
+public ListNode quickSort(ListNode head){
+	if(head==null||head.next==null)
+		return head;
+	ListNode newHead= new ListNode(0);
+	newHead.next=head;
+	sortHelper(newHead,null);
+	return newHead.next;
+}
