@@ -1,0 +1,67 @@
+/*
+  uses arraylist to pass the index next node value;
+  could have used array, same idea.
+*/
+public class SerializeAndDeserializeBT {
+	public static void main(String[] arg){
+		TreeNode node1= new TreeNode(1);
+		TreeNode node2= new TreeNode(2);
+		TreeNode node3= new TreeNode(3);
+		TreeNode node4= new TreeNode(4);
+		TreeNode node5= new TreeNode(5);
+		TreeNode node6= new TreeNode(6);
+		TreeNode node7= new TreeNode(7);
+		TreeNode node8= new TreeNode(8);
+		node1.left=node2;node1.right=node6;
+		node2.left=node3;node2.right=node4;
+		node4.left=node5;node6.right=node7;
+		node7.left=node8;
+		TreeNode.printInorder(node1);
+		SerializeAndDeserializeBT b=  new SerializeAndDeserializeBT();
+		String s = b.serialize(node1);
+		System.out.println();
+		System.out.println(s);
+		TreeNode ret = b.deserialize(s);
+		TreeNode.printInorder(ret);
+	}
+	public void serializeHelper(TreeNode root,StringBuffer sb){
+		if(root==null){
+			sb.append("# ");
+			return;
+		}
+		sb.append(root.val).append(' ');
+		serializeHelper(root.left,sb);
+		serializeHelper(root.right,sb);
+	}
+	public String serialize(TreeNode root){
+		StringBuffer sb= new StringBuffer();
+		serializeHelper(root,sb);
+		sb.deleteCharAt(sb.length()-1);
+		return sb.toString();
+	}
+	public TreeNode deserializeHelper(String[] s, ArrayList<Integer>start){
+		if(s[start.get(0)].length()==0)
+			return null;
+		if("#".equals(s[start.get(0)])){
+			start.set(0,1+start.get(0));
+			return null;
+		}
+		Integer val = Integer.parseInt(s[start.get(0)]);
+		TreeNode root = new TreeNode(val);
+		start.set(0,1+start.get(0));
+		TreeNode left= deserializeHelper(s,start);
+		TreeNode right = deserializeHelper(s,start);
+		root.left=left;
+		root.right=right;
+		PriorityQueue q= new PriorityQueue();
+		//q.
+		return root;
+	}
+	public TreeNode deserialize(String s){
+		String[] vals= s.split(" ");
+		ArrayList<Integer> start = new ArrayList<Integer>();
+		start.add(0);
+		TreeNode root= deserializeHelper(vals, start);
+		return root;
+	}
+}
