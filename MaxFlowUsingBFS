@@ -6,64 +6,64 @@
   
 */
 public static int maxFlow(int[][] graph, int start, int end){
-		int n = graph.length;
-		int[][] residual = new int[n][n];
-		//copy the original matrix as the residual matrix
-		for(int i=0;i<n;i++){
-			for(int j=0;j<n;j++){
-				residual[i][j]=graph[i][j];
-			}
+	int n = graph.length;
+	int[][] residual = new int[n][n];
+	//copy the original matrix as the residual matrix
+	for(int i=0;i<n;i++){
+		for(int j=0;j<n;j++){
+			residual[i][j]=graph[i][j];
 		}
-		int maxFlow = 0;
-		int path=0;
-		// the queue for BFS
-		Queue<Integer> q = new LinkedList<Integer>();
-		int where=0;
-		int cur=0;
-		// the array stores the parent of the current node.
-		int[] from = new int[n];
-		while(true){
-			//bfs to find the augmenting path
-			q.clear();//remove all the leftover from the last augmenting path search.
-			q.offer(start);
-			//initialize the "from" array
-			for(int i=0;i<n;i++)
-				from[i]=-1;	
-			from[start]=start;
-			boolean found = false;
-			//HashSet<Integer> set = new HashSet<Integer>();
-			//set.add(start);
-			while(q.size()>0 && !found){
-				cur = q.poll();
-				for(int i=0;i<n;i++){
-					if(residual[cur][i]>0 && from[i]==-1){
-						q.offer(i);
-						from[i]=cur;
-						//set.add(i);
-						if(i==end)
-							found=true;
-					}
-				}			
-			}
-			//if there is no more augmenting path, break;
-			if(!found)
-				break;
-			//update the residual network;
-			where=end;
-			path=Integer.MAX_VALUE;
-			//1.find the min path_capacity
-			while(from[where]!=where){
-				path=Math.min(path,residual[from[where]][where]);
-				where=from[where];
-			}
-			where=end;
-			//2. update the residual network
-			while(from[where]!=where){
-				residual[from[where]][where]-=path;
-				residual[where][from[where]]+=path;
-				where=from[where];
-			}
-			maxFlow+=path;
-		}
-		return maxFlow;
 	}
+	int maxFlow = 0;
+	int path=0;
+	// the queue for BFS
+	Queue<Integer> q = new LinkedList<Integer>();
+	int where=0;
+	int cur=0;
+	// the array stores the parent of the current node.
+	int[] from = new int[n];
+	while(true){
+		//bfs to find the augmenting path
+		q.clear();//remove all the leftover from the last augmenting path search.
+		q.offer(start);
+		//initialize the "from" array
+		for(int i=0;i<n;i++)
+			from[i]=-1;	
+		from[start]=start;
+		boolean found = false;
+		//HashSet<Integer> set = new HashSet<Integer>();
+		//set.add(start);
+		while(q.size()>0 && !found){
+			cur = q.poll();
+			for(int i=0;i<n;i++){
+				if(residual[cur][i]>0 && from[i]==-1){
+					q.offer(i);
+					from[i]=cur;
+					//set.add(i);
+					if(i==end)
+						found=true;
+				}
+			}			
+		}
+		//if there is no more augmenting path, break;
+		if(!found)
+			break;
+		//update the residual network;
+		where=end;
+		path=Integer.MAX_VALUE;
+		//1.find the min path_capacity
+		while(from[where]!=where){
+			path=Math.min(path,residual[from[where]][where]);
+			where=from[where];
+		}
+		where=end;
+		//2. update the residual network
+		while(from[where]!=where){
+			residual[from[where]][where]-=path;
+			residual[where][from[where]]+=path;
+			where=from[where];
+		}
+		maxFlow+=path;
+	}
+	return maxFlow;
+}
