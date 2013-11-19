@@ -1,0 +1,63 @@
+static class Vertex{
+	int v,last,cap;
+	public Vertex(int v, int last, int cap){
+		this.v=v;
+		this.last=last;
+		this.cap=cap;
+	}
+}
+static class VertexComparator implements Comparator<Vertex>{
+	public int compare(Vertex a, Vertex b){
+		return a.cap - b.cap;
+	}
+}
+public int maxFlow(int[][] graph, int start, int end){
+	int maxFlow = 0;
+	int pathCap=0;
+	int n = graph.length;
+	int[][] residual=new int[][];
+	for(int i=0;i<n;i++){
+		for(int j=0;j<n;j++){
+			residual[i][j]=graph[i][j];
+		}
+	}
+	int[] from = new int[n];
+	PriorityQueue<Vertex> q = new PriorityQueue<Vertex>(n,new VertexComparator());
+	//pfs takes O(E) for each iteration.
+	while(true){
+		q.clear();
+		Arrays.fill(from,-1);
+		q.offer(new Vertex(start,-1,Integer.MAX_VALUE));
+		while(q.size()>0){
+			Vertex v = q.poll();
+			//if visited, the skip
+			if(from[v.v]>0)
+				continue;
+			from[v.v]=v.last;
+			//reaches the end and break the while loop
+			if(v.v==end){
+				pathCap = v.cap;
+				break;
+			}
+			//populate the priority queue as in Dijkstra
+			for(int i=0;i<n;i++){
+				if(from[i]<0 && graph[v.v][i]>0){
+				//min cost if updated here and is passed on to all its successive vertices
+					int minCost = Math.min(v.cap,graph[v.v][i]);
+					q.offer(new Vertex(i,v.v,minCost));
+				}
+			}
+		}
+		//if no augmenting path is found
+		if(pathCap==0)
+			break;
+		//update residual network
+		int where = end;
+		while(from[where]!=-1){
+			residual[where][from[where]]+=pathCap;
+			residual[from[where]][where]-=pathCap;
+			where=from[where];
+		}
+	}
+	return maxFlow;
+}
