@@ -25,6 +25,7 @@ public int maxFlow(int[][] graph, int start, int end){
 	PriorityQueue<Vertex> q = new PriorityQueue<Vertex>(n,new VertexComparator());
 	//pfs takes O(E) for each iteration.
 	while(true){
+		pathCap=0;
 		q.clear();
 		Arrays.fill(from,-1);
 		q.offer(new Vertex(start,-1,Integer.MAX_VALUE));
@@ -58,6 +59,7 @@ public int maxFlow(int[][] graph, int start, int end){
 			residual[from[where]][where]-=pathCap;
 			where=from[where];
 		}
+		maxFlow+=pathCap;
 	}
 	return maxFlow;
 }
