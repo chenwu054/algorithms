@@ -1,0 +1,129 @@
+/*
+  shift array left or right by k in array a without using the triple-reverse algorithm.
+  explanation:
+  http://stackoverflow.com/questions/11893053/circular-left-shift-of-an-array-by-n-positions-in-java
+  
+  
+*/
+public static int greatestCommonDivider(int a, int b){
+	if(b>a) return greatestCommonDivider(b,a);
+	int c= a;
+	while(b!=0){
+		c=a;
+		a=b;
+		b=c%a;
+	}
+	return a;
+}
+public static void shiftArrayRight(int[] a, int k){
+	assert(a!=null||a.length>0);
+	int n = a.length;
+	k=k%n;
+	if(k==0) return;
+	int m = greatestCommonDivider(n,k);
+	for(int i=0;i<m;i++){
+		int temp = a[i];
+		for(int j=i-k+n;j!=i;j=(j-k+n)%n){
+			a[(j+k)%n] = a[j];
+		}
+		a[i+k]=temp;
+	}
+}
+public static void shiftArrayLeft(int[] a, int k){
+	assert(a!=null||a.length>0);
+	int n = a.length;
+	k=k%n;
+	if(k==0) return;
+	int m = greatestCommonDivider(n,k);
+	for(int i=0;i<m;i++){
+		int temp = a[i];
+		for(int j=(i+k)%n;j!=i;j=(j+k)%n){
+			a[(j-k+n)%n] = a[j];
+		}
+		a[i-k+n]=temp;
+	}
+}
+/*
+There is actually a clever algorithm for that. We'll use A to denote the array, N to denote the array size, and n to denote the number of positions to shift. After the shift you would like the i-th element to move to the ((i + n) mode N)-th position, Hence we can define the new positions by the following mapping:
+
+f(j) := (j + n) mod N  (j = 0,...,N - 1)
+The general idea behind this algorithm goes like this: We don't want to move elements around more then necessary, so ideally we would like to simply place each element in it's proper (shifted) position on the first try. Say we start with the element at position i. What we want to do is move the element at position i to position f(i), but then we'll overwrite the element at that position, so we need to first save the element at position f(i) and then perform the shift. Once we shifted the first element, we need to pick another element to shift. Since we want to conserve space, the obvious candidate is the element we just saved (the element that was in position f(i)). Like before, we save the element at position f(f(i)) and then copy our saved element into that position. We keep repeating this process (going through positions i, f(i), f(f(i)), f(f(f(i))), ...) until we reach an element we already shifted (which we are gauranteed to do, since there are finitly many position). If we passed through all of the elements, then we are done, if not then we select another element (that hasn't been shifted yet), say at position j, and repeat the procedure (going through j, f(j), f(f(j)), f(f(f(j))), ...). That's it. But before we can implement such an algorithm, or even before we decide whether this is indeed a good algorithm we need to answer a few questions:
+
+Say we iterate through positions i, f(i), f(f(i)), .... How can we tell that we reached a position that has already been shifted? Do we need to save every position we passed through? If we do, then this means we need to hold an array of size N (to cover all positions), and we also need to perform a lookup every time we shift an element. this would make the algorithm terribly innefficient. Luckily this is not neccessary, since the sequence i, f(i), f(f(i)), ... must wrap around itself at position i, so we only need to wait until we reach that position. We can prove this assetion as follows: Assume that the first repeated element we meet is not i. Then we must have 2 different elements, that when shifted will reach the same position - a contradiction.
+
+Say we finished going through i, f(i), f(f(i)), ..., but there are still elements that remain unshifted (we can tell by counting how many elements we shifted). How do we now find a position j that contains such an element? And also, once we finished this second iteration (going through j, f(j), f(f(j)), ...) how do we find a third position k with an unshifted element? and so on.. This too might suggest we need to save an array to account for used used\unused elements, and perfrom a lookup everytime we need to find an unused element. However, we can again relax, since, as we'll soon show, all of the starting positions (which we denoted by i, j and k) are adjacent. which means, that if we start from position i, we'll next select i + 1, and then i + 2, and so on...
+
+might the sequences i, f(i), f(f(i)), ... and j, f(j), f(f(j)), ... (wherei and j are different) contain common elements? If they do this would mean that the algorithm is useless, since it could shift the same element twice - causing it to end up in the wrong position. The answer then (of course), is that they cannot contain common elements. And we will show why.
+
+Let us denoted := gcd(N, n). For every one of the integers: i = 0,...,d - 1 we define the following set:
+
+S(i) := { kd + i | k = 0,...,N/d - 1}
+It is easy to see that the sets S(0),...,S(d - 1) together cover the set {0,...,N - 1}. We also observe that when dividing an element in a set S(i) by d, we are left with remainder i, and dividing an element from a different set S(j) by d will leave us with a different remainder (j). Thus, no two sets contain a common element. With this we have established that the sets S(0),...,S(d - 1) form a partition of {0,...,N - 1}
+
+Now, for every i = 0,...,d - 1, we will define the set T(i) as i, f(i), f(f(i)), .... By the definition of f we can write T(i) as follows:
+
+T(i) = {(kn + i) mod N | k is an integer}
+We observe that if x is an element in T(i), then we can write for some k:
+
+x = (kn + i) mod N = (k(n/d)d + i) mod N
+Let us denote z := k(n/d) mod N/d, then by multiplying by d, we have:
+
+kn mod N = zd
+and hence:
+
+x = (kn + i) mod N = zd + i
+Thus, x is also in S(i). Similarily, If we take some y from S(i) we observe that for some k:
+
+y = kd + i
+Since gcd(n/d, N/d) = 1 there exists a q such that q(n/d) mod N/d = 1 (a modular inverse), thus we can write (multiplying by kd):
+
+kd = kqn mod N
+and hence:
+
+y = kd + i = ((kq)n + i) mod N
+Thus, y is also in T(i). We conclude that T(i) = S(i). From this fact we can easily show our previous assetions. First off, since the sets form a partition of {0,...,N - 1} the third assertion (no two sequences contain a common element) is satisfied. Second, by the definition of the sets S(i) we can take any group of d adjacent elements in {0,...N - 1} and each of them will be placed in a different set. This satisfies the second assertion.
+
+What this means is that we can rotate all elements in positions 0, d, 2d, ..., (N/d - 1)d by simply replacing the element at position n mod N with the element at position 0, the element at position 2n mod N with the element at position n mod N, and so on.. until we return to the element in position 0 (which we are assured will happen). Here is a pseudo-code example:
+
+temp <- A[0]
+j <- N - (n mod N)
+while j != 0 do
+    A[(j + n) mod N] <- A[j];
+    j <- (j - n) mod N
+A[n mod N] <- temp;
+This covers the entire set S(0). To cover the rest of the sets, Namely S(1), ... ,S(d-1), we will simply iterate over each set the same way we did for the first:
+
+for i <- 0 to d - 1
+    temp <- A[i]
+    j <- N - ((n - i) mod N)
+    while j != i do
+        A[(j + n) mod N] <- A[j];
+        j <- (j - n) mod N
+    A[(i + n) mod N] <- temp;
+Note that while we have two nested loops, each element is moved exactly once, and we use O(1) space. An exmaple of an implementation in Java:
+
+public static int gcd(int a, int b) {
+    while(b != 0) {
+        int c = a;
+        a = b;
+        b = c % a;
+    }
+    return a;
+}
+
+public static void shift_array(int[] A, int n) {
+    int N = A.length;
+    n %= N;
+    if(n < 0)
+        n = N + n;
+    int d = gcd(N, n);
+    for(int i = 0; i < d; i++) {
+        int temp = A[i];
+        for(int j = i - n + N; j != i; j = (j - n + N) % N)
+            A[(j + n) % N] = A[j];
+        A[i + n] = temp;
+    }
+}
+*/
+	
+	

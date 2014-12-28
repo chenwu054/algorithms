@@ -1,0 +1,30 @@
+/*
+  subarray sum to zero
+  FB interview
+  
+*/
+public void getSum(int[]a,int start,int sum,ArrayList<Integer>cur, ArrayList<ArrayList<Integer>>ret){
+	if(start==a.length){
+		if(sum==0){
+			ret.add(cur);
+		}
+		return;
+	}
+	int i=start;
+	while(i<a.length){
+		ArrayList<Integer> row = new ArrayList<Integer>(cur);
+		row.add(a[i]);
+		getSum(a,i+1,sum+a[i],row,ret);		
+		i++;
+		while(i<a.length&&a[i]==a[i-1])
+			i++;
+	}
+}
+public ArrayList<ArrayList<Integer>> getSubarraySumToZero(int[] a){
+	ArrayList<ArrayList<Integer>> ret = new ArrayList<ArrayList<Integer>>();
+	if(a==null||a.length==0)
+		return ret;
+	Arrays.sort(a);
+	getSubarraySumToZero(a,0,0,new ArrayList<Integer>(),ret);
+	return ret;
+}

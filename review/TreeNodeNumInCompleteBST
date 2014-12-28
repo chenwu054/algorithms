@@ -1,0 +1,90 @@
+/*
+  TreeNodeNumInCompleteBST
+  Google phone interview
+*/
+
+//TreeNodeUtil.getLeftChildNode(TreeNode)
+//TreeNodeUtil.getRightChildNode(TreeNode)
+//TreeNodeUtil.isNullNode(TreeNode)
+public class CountCompleteBinayTreeNodes {
+    public int countNodes(TreeNode root) {
+        if(root==null)
+            return 0;
+        TreeNode leftNode=root;
+        TreeNode rightNode=root;
+        int left=0,right=0;
+        while(leftNode!=null){
+            left++;
+            leftNode=leftNode.left;
+        }
+        while(rightNode!=null){
+            right++;
+            rightNode=rightNode.right;
+        }
+        if(left==right)
+            return Math.pow(2,left)-1;
+        int tot=Math.pow(2,right)-1;
+        ListNode node = root;
+        ListNode parent =root;
+        while(parent!=null){
+            int length=0;
+            node=parent.left;
+            while(node!=null){
+                node=node.right;
+                length++;
+            }
+            if(length==right){
+                tot+=Math.pow(2,right);
+                parent=parent.right;
+            }
+            else{
+                parent=parent.left;
+            }
+            right--;
+        }
+        return tot;
+    }
+}
+
+//TreeNodeUtil.getLeftChildNode(TreeNode)
+//TreeNodeUtil.getRightChildNode(TreeNode)
+//TreeNodeUtil.isNullNode(TreeNode)
+public class CountCompleteBinayTreeNodes {
+    public int countNodes(TreeNode root) {
+        if(TreeNodeUtil.isNullNode(root))
+            return 0;
+        TreeNode leftNode=root;
+        TreeNode rightNode=root;
+        int left=0,right=0;
+        while(!TreeNodeUtil.isNullNode(leftNode)){
+            left++;
+            leftNode=TreeNodeUtil.getLeftChildNode(leftNode);
+        }
+        while(!TreeNodeUtil.isNullNode(rightNode)){
+            right++;
+            rightNode= TreeNodeUtil.getRightChildNode(rightNode);
+        }
+        if(left==right)
+            return (1<<left)-1;
+        int tot=(1<<right)-1;
+        TreeNode node = root;
+        TreeNode parent =root;
+        while(!TreeNodeUtil.isNullNode(parent)){
+            int length=0;
+            node= TreeNodeUtil.getLeftChildNode(parent);
+            while(!TreeNodeUtil.isNullNode(node)){
+                node=TreeNodeUtil.getRightChildNode(node);
+                length++;
+            }
+            if(length==right){
+                tot+=1<<(right-1);
+                parent=TreeNodeUtil.getRightChildNode(parent);
+            }
+            else{
+                parent=TreeNodeUtil.getLeftChildNode(parent);
+            }
+            right--;
+        }
+        return tot;
+    }
+}

@@ -1,0 +1,69 @@
+/*
+  most common words in two sequences
+  
+*/
+public class TrieNode{
+	TrieNode[] next;
+	ArrayList<Integer> has;
+	public TrieNode(){
+		next= new TrieNode[26];
+		has=null;
+	}
+}
+public class Trie{
+	TrieNode root;
+	public Trie(){
+		root=new TrieNode();
+	}
+	private ArrayList<Integer> insert(TrieNode root, String s, int start,int i){
+		if(start==s.length()){
+			if(root.has==null){
+				root.has=new ArrayList<Integer>();
+			}
+			root.has.add(i);
+			return root.has;
+		}
+		if(root[s.charAt(start)-'a']==null)
+			root[s.charAt(start)-'a']=new TrieNode();
+		insert(root[s.charAt(start)-'a'],s,start+1);
+	}
+	public ArrayList<Integer> insert(String s, int i){
+		return insert(root,s,0,i);
+	}
+}
+public int[] mostCommonWords(String[] s){
+	int n=s.length;
+	Trie trie = new Trie();
+	int[] count= new int[n];
+	int other=-1,overallMax=-1;
+	int[] ret = {-1,-1};
+	for(int i=0; i<n;i++){
+		String[] words=s[i].split(" ");
+		Arrays.fill(count,0);
+		for(int j=0;j<words.length;j++){
+			ArrayList<Integer> has = trie.insert(words[j]);
+			for(int k=0;k<has.size();k++){
+				if(has.get(k)!=i)
+					count[has.get(k)]++;
+			}
+		}
+		int max=0;
+		for(int j=0;j<n;j++){
+			if(count[j]>max){
+				max=count[j];
+				other=j;
+			}
+		}
+		if(max>overallMax){
+			overallMax=max;
+			ret[0]=i;
+			ret[1]=other;
+		}
+	}
+	return ret;
+	
+}
+n(m*(k+n))
+n^2*m*k
+
+mlogk

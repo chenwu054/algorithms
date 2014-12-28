@@ -1,0 +1,43 @@
+/*
+  generate valid pairs of parenthesis 
+  including {}, [], and ()
+*/
+
+public static  ArrayList<String> generateParentheses(int n){
+	assert(n>0);
+	ArrayList<String> ret = new ArrayList<String>();
+	Stack<Character> k = new Stack<Character>();
+	int[] left= {n,n,n};
+	StringBuilder sb =new StringBuilder();
+	recursion(left,k,sb,ret);
+	return ret;
+}
+private static void recursion(int[] left, Stack<Character> k,StringBuilder sb,ArrayList<String> ret){
+	if(left[0]==0&&left[1]==0&&left[2]==0&&k.size()==0){
+		ret.add(sb.toString());
+		return;
+	}
+	for(int i=0;i<3;i++){
+		char ch = i==0?'(':(i==1?'[':'{');
+		if(left[i]>0){
+			k.push(ch);
+			sb.append(ch);
+			left[i]--;
+			recursion(left,k,sb,ret);
+			sb.deleteCharAt(sb.length()-1);
+			left[i]++;
+			k.pop();
+		}
+	}
+	if(k.size()>0){
+		char c = k.pop();
+		switch(c){
+			case '(': sb.append(')'); break;
+			case '[': sb.append(']'); break;
+			case '{': sb.append('}'); break;
+		}
+		recursion(left,k,sb,ret);
+		k.push(c);
+		sb.deleteCharAt(sb.length()-1);
+	}
+}

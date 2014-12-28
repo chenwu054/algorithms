@@ -1,0 +1,202 @@
+/*
+  remove a node in a bst
+  appeared in Jin's onsite interview at Amazon.
+*/
+
+
+public class ListNode{
+	int val;
+	ListNode next;
+	public ListNode(int v){
+		this.val=v;
+		this.next=null;
+	}
+}
+public ListNode removeDuplicatesAndReverse(ListNode head){
+	if(head==null||head.next==null)
+		return head;
+	ListNode back=head,front=head,last;
+	ListNode newTail=new ListNode(0);
+	newTail.next=head;
+	last=newTail;
+	while(true){
+		back=front;
+		while(front!=null&&front.val==back.val){
+			front++;
+		}
+		if(front==null){
+			back.next=last;
+			newTail.next.next=null;
+			return back;
+		}
+		back.next=last;
+		last=back;
+	}
+}
+
+public TreeNode findLeftMostChild(TreeNode root){
+	if(root==null)
+		return null;
+	if(root.left==null){
+		return root;
+	}
+	TreeNode node=root;
+	while(node!=null && node.left!=null && node.left.left!=null){
+		node=node.left;
+	}
+	TreeNode ret = node.left;
+	node.left=null;
+	return ret;
+}
+public TreeNode findRightMostChild(TreeNode root){
+	if(root==null)
+		return null;
+	if(root.right==null)
+		return root;
+	TreeNode node=root;
+	while(node!=null && node.right!=null && node.right.right!=null)
+		node=node.right;
+	TreeNode ret=node.right;
+	node.right==null;
+	return ret;
+}
+public TreeNode findParent(TreeNode root, TreeNode node){
+	if(root==null)
+		return null;
+	if(root.left==node)
+		return root;
+	if(root.right==node)
+		return root;
+	TreeNode left=null,right==null;
+	if(root.left!=null)
+		left=findParent(root.left,node);
+	if(root.right!=null)
+		right==findParent(root.right,node);
+	if(left==null&&right==null)
+		return null;
+	return left==null?right:left;
+}
+public TreeNode removeBSTNode(TreeNode root, TreeNode toDelete){
+
+	TreeNode newRoot= new TreeNode(0);
+	newRoot.left=root;
+	TreeNode parent=findParent(newRoot,toDelete);
+	if(toDelete==root.left){
+		if(toDelete.right==null){
+			parent.left=toDelete.left;
+			return newRoot.left;
+		}
+		else{
+			TreeNode left=findLeftMostChild(toDelete.right);
+			left.left=toDelete.left;
+			parent.left=toDelete.right;
+			toDelete.left=null;
+			toDelete.right==null;
+			return newRoot.right;
+		}
+	}
+	else{
+		if(toDelete.right==null){
+			parent.right=toDelete.left;
+			return newRoot.left;
+		}
+		else{
+			TreeNode left=findLeftMostChild(toDelete.right);
+			left.left=toDelete.left;
+			parent.right=toDelete.right;
+			toDelete.left=null;
+			toDelete.right==null;
+			return newRoot.right;
+		}
+	}
+
+	/*if(toDelete==root.left){
+		if(toDelete.right!=null){
+			if(toDelete.right.left!=null){
+				TreeNode node = toDelete.right;
+				while(node.left.left!=null)
+					node=node.left;
+				TreeNode replace = node.left;
+				node.left=replace.right;
+				parent.left=replace;
+				replace.left=toDelete.left;
+				replace.right=toDelet.right;
+				return newRoot.left;
+			}
+			else{
+				TreeNode replace=toDelete.right;
+				parent.left=replace;
+				replace.left=toDelete.left;
+				return newRoot.left;
+			}
+		}
+		else if(toDelete.left!=null){
+			if(toDelete.left.right!=null){
+				TreeNode node = toDelete.left;
+				while(node.right.right!=null)
+					node=node.right;
+				TreeNode replace = node.right;
+				node.right=replace.left;
+				parent.left=replace;
+				replace.left=toDelete.left;
+				replace.right=toDelet.right;
+				return newRoot.left;
+			}
+			else{
+				TreeNode replace=toDelete.left;
+				parent.left=replace;
+				replace.right=toDelete.right;
+				return newRoot.left;
+			}
+		}
+		else{
+			parent.left==null;
+			return newRoot.left;
+		}
+	}
+	else{
+		if(toDelete.right!=null){
+			if(toDelete.right.left!=null){
+				TreeNode node = toDelete.right;
+				while(node.left.left!=null)
+					node=node.left;
+				TreeNode replace = node.left;
+				node.left=replace.right;
+				parent.right=replace;
+				replace.left=toDelete.left;
+				replace.right=toDelet.right;
+				return newRoot.left;
+			}
+			else{
+				TreeNode replace=toDelete.right;
+				parent.right=replace;
+				replace.left=toDelete.left;
+				return newRoot.left;
+			}
+		}
+		else if(toDelete.left!=null){
+			if(toDelete.left.right!=null){
+				TreeNode node = toDelete.left;
+				while(node.right.right!=null)
+					node=node.right;
+				TreeNode replace = node.right;
+				node.right=replace.left;
+				parent.right=replace;
+				replace.left=toDelete.left;
+				replace.right=toDelet.right;
+				return newRoot.left;
+			}
+			else{
+				TreeNode replace=toDelete.left;
+				parent.right=replace;
+				replace.right=toDelete.right;
+				return newRoot.left;
+			}
+		}
+		else{
+			parent.right==null;
+			return newRoot.left;
+		}
+	}*/
+
+}

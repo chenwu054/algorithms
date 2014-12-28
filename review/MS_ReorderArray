@@ -1,0 +1,26 @@
+/*
+Given an array [a1, a2, ..., an, b1, b2, ..., bn], transform it to [a1,
+b1, a2, b2, ..., an, bn].
+Requirement: time complexity O(nlogn), space complexity O(logn)
+*/
+public static void recursiveTransform(int[] a, int start, int end){
+	int num=end-start+1;
+	if(num<=2) return;
+	int n=num/2;
+	if(n%2==1){
+		int temp = a[start+n-1];
+		for(int i=0;i<n/2;i++){
+			a[start+n-1+i]=a[start+n+i];
+		}
+		a[start+n+n/2-1]=temp;
+	}
+	for(int i=0;i<n/2;i++){
+		swap(a,start+n/2+i,start+n/2*2+i);
+	}
+	recursiveTransform(a,start,start+n/2*2-1);
+	recursiveTransform(a,start+n/2*2,end);
+}
+public static void transform2(int[] a){
+	assert(a!=null && a.length>0);
+	recursiveTransform(a,0,a.length-1);
+}

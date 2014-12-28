@@ -1,10 +1,6 @@
 /*
-  public class ListNode {
-    public int val;
-    public ListNode next;
-}
+  merge sort linked list
 */
-
 public class LinkListSort {
     public void merge(ListNode head,int len,ListNode[] last){
         if(len<1)

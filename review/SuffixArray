@@ -1,0 +1,74 @@
+/*
+  data structure 
+  suffix array
+  
+*/
+class Suffix implements Comparable<Suffix>{
+	String str;
+	int index;
+	public Suffix(String s, int in){
+		this.str=s;
+		this.index=in;
+	}
+	public int length(){
+		return str.length()-index;
+	}
+	public char charAt(int i){
+		return str.charAt(index+i);
+	}
+	public int compareTo(Suffix that){
+		if(this==that)
+			return 0;
+		int length = Math.min(this.length(),that.length());
+		for(int i=0;i<length;i++){
+			if(this.charAt(i)<that.charAt(i))
+				return -1;
+			if(this.charAt(i)>that.charAt(i))
+				return 1;
+		}
+		return this.length()-that.length();
+	}
+	public String toString(){
+		str.substring(index);
+	}
+}
+
+public class SuffixArray{
+	Suffix[] array;
+	String str;
+	int[] height;
+	int[] sa;
+	public SuffixArray(String s){
+		array=new Suffix[s.length()];
+		for(int i=0;i<array.length;i++){
+			array[i]=new Suffix(s,i);
+		}
+		height=new int[s.length()];
+		Arrays.sort(array);
+		for(int i=1;i<array.length;i++){
+			height[i]=lcp(array[i],array[i-1]);
+		}
+		//starting from 0
+		sa=new int[array.length];
+		for(int i=0;i<sa.length;i++){
+			sa[i]=s.length()-array[i].length();
+		}
+	}
+	private int compare(String query, Suffix suffix) {
+		return query.compareTo(suffix);
+    }
+	public int lcp(Suffix a, Suffix b){
+		int length=Math.min(a.length(),b.length());
+		for(int i=0;i<length;i++){
+			if(a.charAt(i)!=b.charAt(i))
+				return i;
+		}
+		return length;
+	}
+	public String get(int i){
+		if(i>=array.length || i<0)
+			return null;
+		return array[i].toString();
+	}
+
+}	

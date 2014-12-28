@@ -1,0 +1,56 @@
+/*
+  给定一个正整数数列(size = N), 如何将其分为K个子数列，使得每一子数列之和尽可
+能相近(K<N)
+using binary search, return the difference of max and min sum
+*/
+public boolean canSplit(int[] a,int start, int groupNum, int min, int max){
+		if(start==a.length)
+			return groupNum==0;
+		int n = a.length,i=start;
+		int sum = 0;
+		while(i<n){
+			sum+=a[i];
+			if(sum>min){
+				if(sum>max)
+					return false;
+				if(canSplit(a,i+1,groupNum-1,min,max))
+					return true;
+			}
+			i++;
+		}
+		return false;
+	}
+	public int splitKGroupsMinSumDifference(int[] a, int k){
+		int min =0,max=0;
+		for(int i=0;i<a.length;i++){
+			max+=a[i];
+		}
+		int start=0,end=0;
+		int mid=0;
+		while(true){
+			int tempMax=max,tempMin=min;
+			start=min;end=max;
+			while(start<end){
+				mid=start+(end-start+1)/2;
+				if(canSplit(a,0,k,mid,max)){
+					start=mid;
+				}
+				else{
+					end=mid-1;
+				}
+			}
+			min = start;
+			end=max;
+			while(start<end){
+				mid=start+(end-start)/2;
+				if(canSplit(a,0,k,min,mid))
+					end=mid;
+				else
+					start=mid+1;
+			}
+			max=end;
+			if(tempMax==max && tempMin==min)
+				break;
+		}
+		return max-min;
+	}

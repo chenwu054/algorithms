@@ -1,0 +1,56 @@
+/*
+  get k nearest points
+  FB interview
+  
+*/
+
+
+static class Point{
+	double x,y;
+	double dist;
+	public Point(double x,double y){
+		this.x=x;
+		this.y=y;
+		this.dist=Math.sqrt(x*x + y*y);
+	}
+}
+public ArrayList<Point> kNearestPoints(double[] x, double[] y,int k){
+	assert(x!=null&&y!=null && x.length==y.length&&x.length>0);
+	ArrayList<Point> ret =new ArrayList<Point>();
+	ArrayList<Point> points= new ArrayList<Point>();
+	for(int i=0;i<x.length;i++)
+		points.add(new Point(x[i],y[i]));
+	int start=0,end=points.size()-1;
+	while(true){
+		Point pivot=points.get(start);
+		start++;
+		while(start<end){
+			while(start<end && points.get(start).dist< pivot.dist){
+				points.set(start-1,points.get(start));
+				start++;
+			}
+			while(start<end && points.get(end).dist>pivot.dist){
+				end--;
+			}
+			if(start<end){
+				Point temp = points.get(start);
+				points.set(start,points.get(end));
+				points.set(end,temp);
+				start++;
+				end--;
+			}
+		}
+		points.set(end,pivot);
+		if(end==k-1){
+			for(int i=0;i<=end;i++)
+				ret.add(points.get(i));
+			return ret;
+		}
+		else if(end>k-1){
+			end=end-1;
+		}
+		else{
+			start=end+1;
+		}
+	}
+}

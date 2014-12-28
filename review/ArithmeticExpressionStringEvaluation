@@ -1,0 +1,64 @@
+/*
+  arithmetic expression string evaluation
+  FB interview
+  
+*/
+import java.util.*;
+public class Evaluation {
+    //∑µªÿ±Ì¥Ô Ωexprµƒ÷µ
+    private int multiply(int[] num, int[] numIndex,ArrayList<Character> op, int[] opIndex){
+        int tot=num[numIndex[0]++];
+        while(opIndex[0]<op.size()){
+            if(opIndex[0]=='*'){
+                tot*=num[numIndex[0]++];
+            }
+            else if(opIndex[0]=='/'){
+                tot/=num[numIndex[0]++];
+            }
+            else
+                break;
+        }
+        return tot;
+    }
+    public int evaluate(String expr) {
+        if(expr==null||expr.length()==0)
+            return 0;
+        String[] numStr = expr.split("[\\+\\-\\*\\/]");
+        int[] num=new int[numStr.length];
+        for(int i=0;i<numStr.length;i++){
+            num[i]=Integer.parseInt(numStr[i]);
+        }
+        char[] op = new char[num.length-1];
+        //ArrayList<Character> op = new ArrayList<Character>();
+        for(int i=0,k=0;i<expr.length();i++){
+            if(expr.charAt(i)=='+'||expr.charAt(i)=='*'||expr.charAt(i)=='-'||expr.charAt(i)=='/')
+                op[k++]=expr.charAt(i);
+        }
+        for(int i=0;i<op.length;i++){
+            if(op[i]=='*'){
+                num[i+1]=num[i]*num[i+1];
+                num[i]=0;
+            }
+            else if(op[i]=='/'){
+                num[i+1]=num[i]/num[i+1];
+                num[i]=0;                
+            }
+        }
+        int tot=num[0];
+        int i=0;
+        char o='-';
+        while(i<op.length){
+           if(op[i]=='+')
+               o='+';
+           else if(op[i]=='+')
+               o='-';
+           if(o=='+')
+               tot+=num[i+1];
+           else
+               tot-=num[i+1];
+        }
+        return tot;
+        
+        
+    }
+}

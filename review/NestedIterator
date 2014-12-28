@@ -1,0 +1,49 @@
+/*
+
+  nested iterator
+*/
+public class DeepIteratorImpl<T> implements Iterator<T> {
+    // Constructor
+    Stack<Data<T>> k;
+    Stack<Data<T>> next;
+    public DeepIteratorImpl (Collection<Data<T>> c) {
+        // Implementation here
+        k=new Stack<Data<T>>();
+        next=new Stack<Data<T>>();
+        Iterator<Data<T>> it = c.iterator();
+        while(it.hasNext()){
+        	next.push(it.next());
+        }
+        while(next.size()>0){
+        	k.push(next.pop());
+        }
+    }
+    public T next() {
+        // Implementation here
+    	if(k.size()==0)
+    		return null;
+    	while(k.peek().isCollection()){
+    		Iterator<Data<T>> it = k.pop();
+    		while(it.hasNext())
+    			next.push(it.next());
+    		while(next.size()>0)
+    			k.push(next.pop());
+    	}
+    	return k.pop().getElement();
+    }
+    public boolean hasNext() {
+        // Implementation here
+    	return k.size()>0||next.size()>0;
+    }
+}
+
+public interface Data<T> {
+    // Does this Data hold a collection?   
+    public boolean isCollection();
+    // Returns the collection contained by this Data, or null if it is a 
+single element
+    public Collection<Data<T>> getCollection();
+    // Returns the single element contained by this Data, or null if it is a
+collection
+    public T getElement();
+}

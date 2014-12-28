@@ -1,0 +1,133 @@
+/*
+  max product of subarray
+  dp 
+  can have positive and negative numbers 
+  no zero
+  
+*/
+
+/*
+return the max subarray product in an array of both 
+positive and negative real numbers, no zero.
+*/
+public double maxSubarrayProduct(double[] a){
+    assert(a!=null && a.length>0);
+    double ret=a[0];
+
+//maxSoFar is the largest product ending with the current element
+//minSoFar is the smallest product ending with the current element.
+    double maxSoFar = a[0];
+    double minSoFar = a[0];
+
+//posIdx associate with maxSoFar
+//negIdx associate with minSoFar
+    int posStartIdx=0,posEndIdx=0;
+    int negStartIdx=0,negEndIdx=0;
+
+//Idx associate with ret, the global max product.
+    int startIdx=0,endIdx=0;
+    for(int i=1;i<a.length;i++){        
+        double tempPos = maxSoFar*a[i],tempNeg=minSoFar*a[i];
+//---------------------------------------------
+        if(tempPos>ret){
+            ret = tempPos;
+            startIdx=posStartIdx;
+            endIdx=i;
+        }
+        if(tempNeg>ret){
+            ret = tempNeg;
+            startIdx=negStartIdx;
+            endidx=i;
+        }
+        if(a[i]>ret){
+            ret=a[i];
+            startIdx=i;
+            endIdx=i;
+        }
+//-----------------------------------------
+        if(maxSoFar<=tempPos){
+            maxSoFar=tempPos;
+            posEndIdx=i;    
+        }
+        if(maxSoFar<=tempNeg){
+            maxSoFar=tempNeg;
+            posStartIdx=negStartIdx;
+            posEndIdx=i;        
+        }
+        if(maxSoFar<=a[i]){
+            maxSoFar=a[i];
+            posStartIdx=i;
+            posEndIdx=i;
+        }
+//---------------------------------
+        if(minSoFar>=tempPos){
+            minSoFar=tempPos;
+            negStartIdx=posStartIdx;
+            negEndIdx=i;    
+        }
+        if(minSoFar>=tempNeg){
+            minSoFar=tempNeg;
+            negEndIdx=i;        
+        }
+        if(minSoFar>=a[i]){
+            minSoFar=a[i];
+            negStartIdx=i;
+            negEndIdx=i;
+        }
+
+    }
+    return ret;
+}
+
+
+public double maxProductSubarray(double[] a){
+	double prod=1.0;
+	int front=0,back=0;
+	double max=0;
+	while(front<a.length){
+		while(front<a.length && Math.abs(prod)>=1){
+			prod*=a[front++];
+			if(prod>max)
+				max=prod;
+		}
+		while(Math.abs(prod)<1){
+			prod/=a[back++];
+			if(prod>max)
+				max=prod;
+		}
+	}
+	while(back<a.length){
+		prod/=a[back++];
+		if(prod>max)
+			max=prod;
+	}
+	return max;
+}
+public double maxProductSubarray(double[] a){
+	double[] max = new double[a.length];
+	double[] min = new double[a.length];
+	max[0]=a[0];min[0]=a[0];
+	for(int i=1;i<a.length;i++){
+		max[i]=Math.max(max[i-1]*a[i],min[i-1]*a[i]);
+		min[i]=Math.min(max[i-1]*a[i],min[i-1]*a[i]);
+	}
+	double[] maxPos=new double[a.length];maxPos[0]=a[0]>0?a[0]:0;
+	double[] minPos=new double[a.length];minPos[0]=(a[0]>0&&a[0]<1)?a[0]:1;
+	double[] maxNeg=new double[a.length];maxNeg[0]=(a[0]<0)?a[0]:0;
+	double[] minNeg=new double[a.length];minNeg[0]=a[0]<0?a[0]:0;
+	for(int i=1;i<a.length;i++){
+		maxPos[i]=max[i]>maxPos[i-1]?max[i]:maxPos[i-1];
+		minPos[i]=(min[i]>0&&min[i]<minPos[i-1])?min[i]:minPos[i-1];
+		maxNeg[i]= (min[i]<0&&min[i]>maxNeg[i-1]):min[i]:maxNeg[i-1];
+		minNeg[i]=min[i]<minNeg[i-1]?min[i]:minNeg[i-1];
+	}
+	for(int i=0;i<a.length;i++){
+		if(maxPos[i]/minPos[i]>max)
+			max=maxPos[i]/minPos[i];
+		if(maxNeg[i]<0){
+			if(minNeg[i]/maxNeg[i]>max)
+				max=minNeg[i]/maxNeg[i];
+		}
+	}
+	return max;
+}

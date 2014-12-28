@@ -1,0 +1,61 @@
+/*
+  一个deque，但是只支持pushBack，pushFront，popBack， 没有popFront
+给一个1-N的排列，问能否把1-N按照从小到大的顺序push到deque，pop的时机可以任选
+，使得pop出的顺序刚好是给定的排列
+比如： 给定 23145， 那么对12345对应的操作序列是pushBack，pushBack，popBack，
+pushBack，popBack，popBack，pushBack，popBack，pushBack，popBack
+要求如果可能，输出任意一个可能的操作序列，如果没有可能的操作序列，输出
+impossible
+
+consider the relative positions.
+*/
+public class DequeSort {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		int[] output={3,1,2,4};
+		int[] input={1,2,4,3};
+		sort(input, output);
+	}
+	public static void sort(int[] input, int[] output){
+		Map<Integer,Integer> outputMap = new HashMap<Integer,Integer>();
+		int n=output.length;
+		for(int i=0;i<n;i++){
+			outputMap.put(output[i],i);
+		}
+		ArrayDeque<Integer> q= new ArrayDeque<Integer>();
+		Queue<String> outputString = new LinkedList<String>();
+		int outputIndex = 0,i=0;
+		while(i<n){
+			if(input[i]==output[outputIndex]){
+				outputString.offer("pushback");
+				outputString.offer("popback");
+				outputIndex++;
+				while(q.size()>0 && output[outputIndex]==q.peekLast()){
+					outputString.offer("popback");
+					q.pollLast();
+					outputIndex++;
+				}
+			}
+			else if(q.size()==0 || outputMap.get(input[i])<outputMap.get(q.peekFirst())){
+				outputString.offer("pushback");
+				q.offerLast(input[i]);
+			}
+			else{
+				outputString.offer("pushfront");
+				q.offerFirst(input[i]);
+			}
+			i++;
+		}
+		if(q.size()!=0)
+			System.out.println("impossible");
+		else{
+			while(outputString.size()>0){
+				System.out.println(outputString.poll());
+			}
+		}
+	}
+}

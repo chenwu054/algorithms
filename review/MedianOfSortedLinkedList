@@ -1,0 +1,29 @@
+/*
+  
+*/
+
+double getMedian(ListNode* head){
+	if(head==NULL)
+		return 0.0;
+	ListNode* node=head;
+	int length=0;
+	while(node!=NULL){
+		length++;
+		node=node->next;
+	}
+	if(length%2==1){
+		return getKthNode(head,length/2+1);
+	}
+	else{
+		return (getKthNode(head,length/2)+getKthNode(head,length/2+1))/2;
+	}
+}
+double getKthNode(ListNode* head, int n){
+	int k=1;
+	ListNode* node=head;
+	while(k<n){
+		node=node->next;
+		k++;
+	}
+	return node->val;
+}

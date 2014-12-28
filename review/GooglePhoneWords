@@ -1,0 +1,86 @@
+/*
+	类似电话面板的一道题，输入是一个List<Integer> digits, 一串数字，每个数字对应
+可以翻译为3个character。翻译后的结果的pertutation是否可以组成一个单词，如果
+可以，保存为结果集，输出。
+
+Example:
+2--> 'a','b','c'
+8--> 't','u','c'
+
+如果输入是228，
+228 --> 'aat','abu',...
+
+可以用2个函数
+digits2char(int d)
+isWord(String u)
+
+输出是'aat','abu',...中所有的是单词的结果。
+Set<String> phoneWords(List<Integer> digits){
+}
+
+*/
+/*
+  iterative and recursive are both appropriate;
+  however, using string in c++ or stringbuilder in java can reduce the space complexity to the length of input.
+*/
+
+#include <string>
+#include <stack>
+#include <vector>
+#include <iostream>
+using namespace std;
+
+string digits2char(int a){
+	switch(a){
+		case 2: return "abc"; 
+		case 8: return "tlm";
+		case 1: return "qp";
+	}
+}
+vector<string> phoneWords(vector<int> digits){
+	stack<int> k;
+	vector<string> ret;
+	int n = digits.size();
+	vector<string> mapping;
+	for(int i=0;i<digits.size();i++)
+		mapping.push_back(digits2char(digits[i]));
+	string s(n,0);
+	k.push(0);
+	s[0]=mapping[0][0];
+	while(!k.empty()){
+		while(k.size()<n-1){
+			s[k.size()] = mapping[k.size()][0];
+			k.push(0);
+		}
+		string lastStr = mapping[n-1];
+		for(int i=0;i<lastStr.size();i++){
+			s[n-1]=lastStr[i];
+			//if(isWord(s))
+				ret.push_back(s);
+		}
+		while(!k.empty() && k.top()==mapping[k.size()-1].size()-1){
+			k.pop();
+		}
+		if(!k.empty()){
+			int a = k.top();
+			k.pop();
+			k.push(a+1);
+			s[k.size()-1]=mapping[k.size()-1][k.top()];
+		}
+	}
+	return ret;
+}
+
+int main(){
+	vector<int> digits(3,0);
+	digits[0]=2;
+	digits[1]=1;
+	digits[2]=8;
+	vector<string> v = phoneWords(digits);
+	for(int i=0;i<v.size();i++){
+		cout<<v[i]<<endl;
+	}
+	int a;
+	cin>>a;
+	return 0;
+}

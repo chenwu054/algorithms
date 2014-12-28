@@ -1,0 +1,42 @@
+/*
+  test if all the nodes along the same path
+  careercup amazon onsite
+  
+*/
+
+
+public boolean valid(TreeNode root, int n, ArrayList<Integer> path, int i){
+	if(n==root.val)
+		return true;
+	if(i==path.size()){
+		if(n<root.val){
+			path.add(0);
+			return valid(root.left,n,path,i+1);
+		}
+		else{
+			path.add(1);
+			return valid(root.right,n,path,i+1);
+		}
+	}
+	if(n<root.val){
+		if(path.get(i)==1)
+			return false;
+		return valid(root.left,n,path,i+1);
+	}
+	else{
+		if(path.get(i)==0)
+			return false;
+		return valid(root.right,n,path,i+1);
+	}
+}
+
+public boolean samePath(TreeNode root, ArrayList<Integer> g){
+	ArrayList<Integer> path  = new ArrayList<Integer>();
+	for(int i=0;i<g.size();i++){
+		if(!valid(root,g.get(i),path,0))
+			return false;
+	}
+	return true;
+	
+	
+}

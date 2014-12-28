@@ -1,0 +1,67 @@
+/*b) 有若干个盒子，每个盒子有length和width，不考虑高度。只要尺寸fit，大盒子就可以放小盒子，但是一层只能套一个，即便还有空余；但可以多层嵌套。
+求最小的面积放所有的盒子
+比如 7*7  5*5, 4*6, 3*3
+
+答案是7*7+4*6
+
+http://www.meetqun.com/thread-2324-1-2.html
+!!!Greedy algorithm does not work:
+counter example: 1*9，4*4，4*10，6*8
+optimal: 4*10,6*8
+
+ * */
+public class MinBoxesSpace {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Box b = new Box(1,9);
+		ArrayList<Box> arr = new ArrayList<Box>();
+		arr.add(b);
+		b=new Box(3,8);
+		arr.add(b);
+		b=new Box(4,10);
+		arr.add(b);
+		b=new Box(6,8);
+		arr.add(b);
+		
+		Integer ret = minBoxSpace(arr);
+		System.out.println(ret);
+	}
+	public static Integer minBoxSpace(ArrayList<Box> boxes){
+		int n = boxes.size();
+		boolean[] valid=new boolean[n];
+		Arrays.fill(valid,true);
+		Integer[] minSpace=new Integer[1];
+		recursiveMinSpace(boxes,valid,0,0,minSpace);
+		return minSpace[0];
+	}
+	public static void recursiveMinSpace(ArrayList<Box>boxes, boolean[] valid, int start,int sum, Integer[] minSpace){
+		if(start>=boxes.size()){
+			minSpace[0]=minSpace[0]==null||minSpace[0]>sum?sum:minSpace[0];
+			return;
+		}
+		for(int i=start-1;i>=0;i--){
+			if(valid[i] && boxes.get(start).contains(boxes.get(i))){
+				valid[i]=false;
+				recursiveMinSpace(boxes,valid,start+1,sum+boxes.get(start).size-boxes.get(i).size,minSpace);
+				valid[i]=true;
+			}
+		}
+		recursiveMinSpace(boxes,valid,start+1,sum+boxes.get(start).size,minSpace);		
+	}
+}
+class Box{
+	int length,width,size;
+	public Box(int length,int width){
+		this.length=length;
+		this.width=width;
+		this.size=this.length*this.width;
+	}
+	public boolean contains(Box other){
+		
+		return (this.length>=other.length && this.width>=other.width);
+	}
+}
