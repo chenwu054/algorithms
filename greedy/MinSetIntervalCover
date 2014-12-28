@@ -1,0 +1,61 @@
+/*
+  find the min number of intervals cover the target interval.assume there is always a cover.
+  
+  greedy: always find the largest cover.
+  
+*/
+
+public class MinSetIntervalCover {
+
+
+	static class IntervalComparator implements Comparator<Interval>{
+		public int compare(Interval a, Interval b){
+			if(a.start!=b.start)
+				return a.start-b.start;
+			return a.end-b.end;
+		}
+	}
+	static class Interval{
+		int start,end;
+		public Interval(int start, int end){
+			this.start=start;
+			this.end=end;
+		}
+	}
+	public int minIntervalCover(ArrayList<Interval> list, Interval target){
+		Collections.sort(list,new IntervalComparator());
+		Stack<Interval> k = new Stack<Interval>();
+		Stack<Integer> min = new Stack<Integer>();
+		min.push(target.start);
+		int i=0,n=list.size();
+		while(i<n && list.get(i).end<min.peek())
+			i++;
+		k.push(list.get(i));
+		min.push(list.get(i).end+1);
+		while(i<n){
+			int lastMin = min.pop();
+			//case 1: current interval is better than the last interval
+			if(list.get(i).start<=min.peek() && list.get(i).end>=lastMin){
+				k.pop();
+				k.push(list.get(i));
+				min.push(list.get(i).end+1);
+			}
+			//case 2: current and later intervals are no longer better but it covers more if added. 
+			else if(list.get(i).start<=lastMin && list.get(i).end>=lastMin){
+				//min.push();
+				k.push(list.get(i));
+				min.push(lastMin);
+				min.push(list.get(i).end+1);
+			}
+			else
+				min.push(lastMin);
+			i++;
+		}
+		/*while(k.size()>0){
+			Interval interval = k.pop();
+			System.out.println(interval.start+":"+interval.end);
+		}*/
+		
+		return k.size();
+	}
+}
