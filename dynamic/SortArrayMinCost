@@ -1,0 +1,51 @@
+ven an array A of positive integers. Convert it to a sorted array with minimum cost. The only valid operation are:
+-1) Decrement with cost = 1
+-2) Delete an element completely from the array with cost = value of element
+-*/
+-/* operation:
+-		delete -> number of element as one metric
+-		decrease -> value of the elements, another metric
+-		therefore, dp[][] has number as row and value(the last element in the sorted array) as column
+-		dp[][] stores the optimization function value;
+-		the following algorithm may or may not be correct.
+-		
+-		dp[i][j]= if a[i]>=a[j]   dp[i-1][j-1] + a[i]-a[j]
+-                	else   min(dp[i-1][i], dp[i-1][j] + a[i] )
+-
+-
+-*/
+-public static int convert(int[] a){
+-	int n = a.length;
+-	int[][] dp = new int[n][n];
+-	for(int i=0;i<n;i++){
+-		if(a[0]>a[i])
+-			dp[0][i]=a[0]-a[i];
+-	}
+-	for(int i=1;i<n;i++){
+-	//j is the index of the sorted ending array
+-		for(int j=0;j<n;j++){
+-			//not including a[i]
+-			if(j<i){
+-				dp[i][j]=dp[i-1][j]+a[i];
+-			}
+-			else{
+-				//the real last element may or may not be a[i]
+-				//if keep a[i], then the real ending value is a[i], so dp[i][j]=dp[i-1][j]
+-				//if do not keep a[i], dp[i][j]=dp[i-1][j]+a[i];
+-				if(a[i]<a[j]){
+-					dp[i][j]=Math.min(dp[i-1][i],dp[i-1][j]+a[i]);
+-				}
+-				// keep sorted, the extra value should be deleted.
+-				else{
+-					dp[i][j]=dp[i-1][j]+a[i]-a[j];
+-				}
+-			}
+-		}
+-	}
+-	int ret = dp[n-1][0];
+-	for(int i=1;i<n;i++){
+-		if(ret>dp[n-1][i])
+-			ret=dp[n-1][i];
+-	}
+-	return ret;
+-}
