@@ -1,0 +1,151 @@
+import java.util.ArrayList;
+import java.util.List;
+/*
+KdTree is a binary-search-tree-based data structure for sovlving geometric problems in generic K-dimension.
+The following is an example two-dimension, an x-y plane.
+Apart from the insertion method, it has two additional methods: range search and nearest neighbor.
+range search, searches for all the points in the plane that are inside the rectangular range, typical runtime is 
+O(R+lgn), where R is the number of return points and n is the number of points in the plane. Worst case can be proven
+to be O(R+sqrt(n));
+nearest neighbor, searches for the nearest point in the plane to a given point.runtime is typically O(lgn) and worst
+case is O(n), e.g all points in on a circle and the given point is the center and etc.
+*/
+public class KdTree{
+	static class Point{
+		double x,y;
+		public Point(double x,double y){
+			this.x=x;
+			this.y=y;
+		}
+	}
+	static class KdNode{
+		Point p;
+		KdNode left,right;
+		int count;
+		public KdNode(Point p){
+			this.p=p;
+			left=null;right=null;
+			count=1;
+		}
+		public String toString(){
+			return "("+p.x+","+p.y+")["+count+"]";
+		}
+	}
+	KdNode root;
+	Double tolerance;
+	KdNode last=null;
+	public KdTree(double tolerance){
+		root=null;
+		this.tolerance=tolerance;
+		last=null;
+	}
+	public KdNode insert(KdNode node){
+		if(root==null){
+			root=node;
+			return root;
+		}
+		boolean isOdd=true;
+		boolean isLess=false;
+		boolean isInTolerance=false;
+		KdNode current = root;
+		KdNode parent=root;
+		while(current!=null){
+			isInTolerance = distance(node,current)<tolerance;
+			if(isInTolerance){
+				current.count++;
+				return current;
+			}
+			isLess=isOdd?node.p.x<current.p.x:node.p.y<current.p.y;
+			parent=current;
+			current = isLess?current.left:current.right;
+			isOdd=!isOdd;
+		}
+		if(isLess)
+			parent.left=node;
+		else
+			parent.right=node;
+		return node;
+	}
+	public static double distance(KdNode a,KdNode b){
+		return Math.sqrt(Math.pow(a.p.x-b.p.x,2)+Math.pow(a.p.y-b.p.y,2));
+	}
+	private boolean isInRange(KdNode root, Point bottomLeft,Point topRight){
+		if(root==null)
+			return false;
+		return root.p.x>=bottomLeft.x&&root.p.x<=topRight.x&&root.p.y>=bottomLeft.y&&root.p.y<=topRight.y;
+	}
+	private void rangeSearch(KdNode root,Point bottomLeft,Point topRight,boolean isOdd, List<KdNode> col){
+		if(root==null)
+			return;
+		if(isInRange(root,bottomLeft,topRight))
+			col.add(root);
+		double min = isOdd?bottomLeft.x:bottomLeft.y;
+		double max= isOdd?topRight.x:topRight.y;
+		double determinant = isOdd?root.p.x:root.p.y;
+		if(determinant>min)
+			rangeSearch(root.left,bottomLeft,topRight,!isOdd,col);
+		if(determinant<=max)
+			rangeSearch(root.right,bottomLeft,topRight,!isOdd,col);
+		
+	}
+	public ArrayList<KdNode> rangeSearch(Point bottomLeft,Point topRight){
+		ArrayList<KdNode> ret=new ArrayList<KdNode>();
+		rangeSearch(root,bottomLeft,topRight,true,ret);
+		return ret;
+	}
+	private void getNearestNode(KdNode root, KdNode target,boolean isOdd,KdNode[] nearest, double[] minDist){
+		if(root==null)
+			return;
+		double d = distance(root,target);
+		double axisDistance=isOdd?root.p.x-target.p.x:root.p.y-target.p.y;
+		if(nearest[0]==null||d<minDist[0]){
+			minDist[0]=d;
+			nearest[0]=root;
+		}
+		if(d<tolerance)
+			return;
+		getNearestNode(axisDistance>0?root.left:root.right,target,!isOdd,nearest,minDist);
+		if(Math.abs(axisDistance)>minDist[0]) return;
+		getNearestNode(axisDistance>0?root.right:root.left,target,!isOdd,nearest,minDist);
+	}
+	public KdNode getNearestNode(KdNode target){
+		double[] minDist={Double.MAX_VALUE};
+		KdNode[] nearest = new KdNode[1];
+		nearest[0]=null;
+		getNearestNode(root,target,true,nearest,minDist);
+		return nearest[0];
+	}
+	public void iterate(KdNode root){
+		if(root==null)
+			return;
+		iterate(root.left);
+		System.out.println(root);
+		iterate(root.right);
+	}
+	public void iterate(){
+		iterate(root);
+	}
+	public static void main(String[] arg){
+		KdTree k = new KdTree(0.1);
+		KdNode node1 = new KdNode(new Point(0,0));
+		KdNode node2 = new KdNode(new Point(1,4));
+		KdNode node3 = new KdNode(new Point(2,3));
+		KdNode node4 = new KdNode(new Point(-2,0));
+		KdNode node5 = new KdNode(new Point(-4,3));
+		KdNode node6 = new KdNode(new Point(-3,-3));
+		KdNode node7 = new KdNode(new Point(4,1));
+		k.insert(node1);
+		k.insert(node2);
+		k.insert(node3);
+		k.insert(node4);
+		k.insert(node5);
+		k.insert(node6);
+		k.insert(node7);
+		k.iterate();
+		System.out.println("---------------");
+		ArrayList<KdNode> ret=k.rangeSearch(new Point(-4,-4), new Point(2,4));
+		for(KdNode d:ret){
+			System.out.println(d);
+		}
+	}
+}

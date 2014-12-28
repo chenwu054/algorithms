@@ -1,0 +1,32 @@
+/*
+  traverse the tree in preorder without using recursion.
+*/
+public class PreorderTraversal{
+	Stack<TreeNode> k;
+	TreeNode root;
+	public PreorderTraversal(TreeNode root){
+		this.root=root;
+		k=new Stack<TreeNode>();
+		if(root!=null){
+			k.push(root);
+		}
+	}
+	public TreeNode next(){
+		if(k.isEmpty())
+			return null;
+		TreeNode ret = k.pop();
+		//push right first since it will pop out later
+		if(ret.right!=null)
+			k.push(ret.right);
+		//push left first since it will pop out first
+		if(ret.left!=null)
+			k.push(ret.left);
+		return ret;
+	}
+	public boolean hasNext(){
+		return k.isEmpty();
+	}
+	public TreeNode peek(){
+		return k.peek();
+	}
+}

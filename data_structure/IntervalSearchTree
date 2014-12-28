@@ -1,0 +1,128 @@
+public class IntervalSearchTree{
+	/*
+	we use the start as our key in the interval search tree 
+	and apart from interval, we have another member that is the maximum end 
+	of the subtree.
+	This is a bineary-search-tree-based binary tree, which deals with interval in 1 dimension.
+	It has various applications. For instance, find all the overlapping rectangles given one specific rectangle;
+	find the intersection points of a group of vertical or horizontal lines and etc.
+	Those binary search tree based data structures are particularly good for preprocessing a large number of instances and 
+	repetitively search the tree regarding an input node.
+	*/
+	static class Interval{
+		int start,end;
+		public Interval(int start, int end){
+			this.start=start;
+			this.end=end;
+		}
+	}
+	static class IntervalNode{
+		Interval interval;
+		IntervalNode left,right;
+		Integer max;
+		public IntervalNode(int low, int high){
+			this.interval=new Interval(low,high);
+			max=high;
+			left=null;right=null;
+		}
+		public String toString(){
+			return "("+interval.start+":"+interval.end+")["+max+"]";
+		}
+	}
+	IntervalNode root=null;
+	//insert the newNode and return the max of all its subtree.
+	private Integer insert(IntervalNode root, IntervalNode newNode){
+		if(root==null)
+			return null;
+		if(root.interval.start==newNode.interval.start){
+			root.interval.end=Math.max(root.interval.end,newNode.interval.end);
+			root.max=Math.max(root.max,root.interval.end);
+			return root.max;
+		}
+		Integer max=null;
+		if(root.interval.start>newNode.interval.start){
+			max = insert(root.left,newNode);
+			if(max==null){
+				root.left=newNode;
+				max=Math.max(root.max,newNode.max);
+			}
+		}
+		else{
+			max=insert(root.right,newNode);
+			if(max==null){
+				root.right=newNode;
+				max=Math.max(root.max,newNode.max);
+			}
+		}
+		root.max=Math.max(max,root.max);
+		return root.max;
+	} 
+	public void insert(int low, int high){
+		IntervalNode newNode= new IntervalNode(low,high);
+		if(root==null){
+			root=newNode;
+			return;
+		}
+		insert(root,newNode);
+	}
+	public void delete(IntervalNode toDelete){
+			
+	}
+	public IntervalNode searchOneOverlappingInterval(int low,int high){
+		IntervalNode node=root;
+		if(node==null)
+			return null;
+		while(node!=null){
+			if(!(high<node.interval.start || low>node.interval.end))
+				return node;
+			if(root.left==null||root.left.max<low)
+				node=node.right;
+			else
+				root=root.left;
+		}
+		return null;
+	}
+	private void searchAllOverlappingIntervals(IntervalNode root, int low, int high,ArrayList<IntervalNode> col){
+		if(root==null)
+			return;
+		if(!(root.interval.start>=high||root.interval.end<=low))
+			col.add(root);
+		if(root.left!=null && root.left.max>low)
+			searchAllOverlappingIntervals(root.left,low,high,col);
+		if(root.right!=null && root.right.max>low)
+			searchAllOverlappingIntervals(root.right,low,high,col);
+	}
+	public ArrayList<IntervalNode> searchAllOverlappingIntervals(int low, int high){
+		ArrayList<IntervalNode> ret = new ArrayList<IntervalNode>();
+		searchAllOverlappingIntervals(root,low,high,ret);
+		return ret;
+	}	
+	private void iterate(IntervalNode root){
+		if(root==null)
+			return;
+		iterate(root.left);
+		System.out.println(root);
+		iterate(root.right);
+	}
+	public void iterate(){
+		iterate(root);
+	}
+	public static void main(String[] arg){
+		IntervalSearchTree t = new IntervalSearchTree();
+		t.insert(12, 14);
+		t.insert(3, 7);
+		t.insert(16, 25);
+		t.insert(9, 11);
+		t.insert(13, 34);
+		t.insert(21, 31);
+		t.insert(1, 9);
+		t.insert(14, 19);
+		t.iterate();
+		System.out.println("------------");
+		System.out.println(t.searchOneOverlappingInterval(18,19));
+		System.out.println("------------");
+		ArrayList<IntervalNode> ret = t.searchAllOverlappingIntervals(8,16);
+		for(IntervalNode node: ret)
+			System.out.println(node);
+	}
+}

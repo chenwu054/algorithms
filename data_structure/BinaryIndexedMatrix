@@ -1,0 +1,65 @@
+/*
+  Based on the implementation of binary indexed tree, it could be extended to 2-d matrix.
+  Constructing the auxiliary matrix takes O(m*n*logn*logm), matrix is m by n.
+  The following includes 1.constructing the binary indexed matrix. 2. search for a sum from (i1,j1) to (i2,j2)
+  3. update the value in cell (i,j)
+*/
+public class BinaryIndexedMatrix {
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		
+	}
+	public int[][] matrix;
+	public int[][] bit;
+	public BinaryIndexedMatrix(int[][] a){
+		assert(a!=null && a.length>0);
+		this.matrix=a;
+		int n=a.length,m=a[0].length;
+		bit=new int[n+1][m+1];
+		for(int i=0;i<n;i++){
+			for(int j=0;j<m;j++){
+				int x=i+1;
+				while(x<=n){
+					int y=j+1;
+					while(y<=m){
+						bit[x][y]+=matrix[i][j];//matrix is 0-based while bit is 1-based(real data starts from 1)
+						y += y&(-y);
+					}
+					x += x&-x;
+				}
+			}
+		}
+	}
+	//need to convert from 0-based to 1-based.
+	public int read(int x, int y){
+		int sum=0;
+		x++;
+		y++;
+		while(x>0){
+			int y1=y;
+			while(y1>0){
+				sum+=bit[x][y];
+				y-=y&-y;
+			}
+			x-=x&-x;
+		}
+		return sum;
+	}
+	public int read(int x,int y,int x1,int y1){
+		return read(x,y)-read(x1-1,y)-read(x,y1-1)+read(x1-1,y1-1);
+	}
+	//update the value in cell (x,y) to a given value;
+	public void update(int x,int y, int value){
+		int diff=value-matrix[x][y];
+		matrix[x][y]=value;
+		x++;y++;
+		while(x<bit.length){
+			int y1=y;
+			while(y1<bit[0].length){
+				bit[x][y]+=diff;
+				y1 +=y1&-y1;
+			}
+			x+=x&-x;
+		}
+	}
+}

@@ -1,0 +1,196 @@
+/*
+  a space efficient alternative to trie
+*/
+public class TernarySearchTree {
+	
+	static class TernaryNode {
+		char l;
+		TernaryNode left,right,next;
+		int info;
+		boolean isWord;
+		public TernaryNode(char letter){
+			l=letter;
+			left=null;right=null;next=null;
+			isWord=false;
+			info=0;
+		}
+		public TernaryNode(){}
+	}
+	TernaryNode root;
+	//initiate a root Ternary search tree node and make it in the middle of the alphabet.
+	public TernarySearchTree() {
+		root = new TernaryNode((char) ('a' + 13));
+	}
+
+	private void add(TernaryNode root, String s, int start) {
+		if (root.l == s.charAt(start)) {
+			if (start == s.length() - 1) {
+				root.isWord = true;
+				root.info++;
+			} else {
+				if (root.next == null)
+					root.next = new TernaryNode(s.charAt(start + 1));
+				add(root.next, s, start + 1);
+			}
+		} else if (root.l < s.charAt(start)) {
+			if (root.right == null)
+				root.right = new TernaryNode(s.charAt(start));
+			add(root.right, s, start);
+		} else {
+			if (root.left == null)
+				root.left = new TernaryNode(s.charAt(start));
+			add(root.left, s, start);
+		}
+	}
+
+	public void add(String s) {
+		if (s == null || s.length() == 0)
+			return;
+		add(root, s, 0);
+	}
+
+	private boolean search(TernaryNode root, String s, int start) {
+		if (root == null)
+			return false;
+		if (s.charAt(start) == root.l) {
+			if (start == s.length() - 1)
+				return root.isWord;
+			return search(root.next, s, start + 1);
+		} else if (s.charAt(start) > root.l)
+			return search(root.right, s, start);
+		else
+			return search(root.left, s, start);
+	}
+
+	public boolean search(String s) {
+		return search(root, s, 0);
+	}
+
+	private void partialSearch(TernaryNode root, String s, int start, ArrayList<String> col, StringBuilder cur) {
+		if (root == null || start >= s.length())
+			return;
+		if (root.l == s.charAt(start)) {
+			StringBuilder sb = new StringBuilder(cur).append(root.l);
+			if (start == s.length() - 1) {
+				if (root.isWord)
+					col.add(sb.toString());
+			} else
+				partialSearch(root.next, s, start + 1, col, sb);
+		} else if (s.charAt(start) == '.') {
+			partialSearch(root.left, s, start, col, cur);
+			partialSearch(root.next, s, start + 1, col,
+					new StringBuilder(cur).append(root.l));
+			partialSearch(root.right, s, start, col, cur);
+		} else if (s.charAt(start) < root.l)
+			partialSearch(root.left, s, start, col, cur);
+		else
+			partialSearch(root.right, s, start, col, cur);
+	}
+	/*
+		search for the pattern "a.a",where '.' stands for any non-empty char,e.g "aza","aaa","aba" etc.
+	*/
+	public ArrayList<String> partialSearch(String s) {
+		ArrayList<String> ret = new ArrayList<String>();
+		partialSearch(root, s, 0, ret, new StringBuilder());
+		return ret;
+	}
+
+	/*
+	 * find all the strings within the given hamming distance to be implemented
+	 */
+	private void nearNeighborSearch(TernaryNode root, String s,int start, int dist,StringBuilder cur, ArrayList<String> col){
+		if(root==null||start>=s.length()||dist<0) return;
+		StringBuilder sb =new StringBuilder(cur).append(root.l);
+		int newDist=dist;
+		if(start==s.length()-1){
+			if(!(root.l==s.charAt(start)))
+				newDist--;
+			if(newDist>=0 && root.isWord){
+				col.add(sb.toString());	
+			}
+			return;
+		}
+		nearNeighborSearch(root.left,s,start,dist,cur,col);
+		nearNeighborSearch(root.right,s,start,dist,cur,col);
+		if(root.l==s.charAt(start))
+			nearNeighborSearch(root.next,s,start+1,dist,sb,col);
+		else
+			nearNeighborSearch(root.next,s,start+1,dist-1,sb,col);
+			
+	}
+
+	public ArrayList<String> nearNeighborSearch(String s, int dist) {
+		ArrayList<String> ret = new ArrayList<String>();
+		nearNeighborSearch(root, s, 0, dist, new StringBuilder(), ret);
+		return ret;
+	}
+	/*
+	 * count the words in the tree
+	 * */
+	private void wordCount(TernaryNode root, StringBuilder cur, HashMap<String, Integer> col) {
+		if (root == null)
+			return;
+		wordCount(root.left, cur, col);
+		StringBuilder sb = new StringBuilder(cur).append(root.l);
+		if (root.isWord) {
+			String s = sb.toString();
+			if (!col.containsKey(s))
+				col.put(s, root.info);
+			else
+				col.put(s, 1 + col.get(s));
+		}
+		wordCount(root.next, sb, col);
+		wordCount(root.right, cur, col);
+	}
+
+	public HashMap<String, Integer> wordCount() {
+		HashMap<String, Integer> ret = new HashMap<String, Integer>();
+		wordCount(root, new StringBuilder(), ret);
+		return ret;
+	}
+	
+	public static void main(String[] arg) {
+		TernarySearchTree t = new TernarySearchTree();
+		t.add("apple");
+		t.add("banana");
+		t.add("orange");
+		t.add("pineapple");
+		t.add("pineapple");
+		t.add("banana");
+		t.add("aaaaa");
+		t.add("aabba");
+		t.add("accaa");
+		t.add("cacaa");
+		t.add("bacaa");
+		t.add("bbaab");
+		t.add("ted");
+		t.add("pineapple");
+		t.add("pajama");
+		t.add("lalala");
+		t.add("pajama");
+		t.add("peach");
+		HashMap<String, Integer> ret = t.wordCount();
+		for (String s : ret.keySet()) {
+			System.out.println(s + " : " + ret.get(s));
+		}
+		System.out.println();
+		System.out.println(t.search("apple"));
+		System.out.println(t.search("orange"));
+		System.out.println(t.search("pineapple"));
+		System.out.println(t.search("banana"));
+		System.out.println(t.search("pajama"));
+		System.out.println(t.search("peach"));
+		System.out.println(t.search("peack"));
+		System.out.println(t.search("lalala"));
+		System.out.println("--------------");
+		ArrayList<String> part = t.partialSearch(".a.a.a");
+		System.out.println(part.size());
+		for (String s : part)
+			System.out.println(s);
+		System.out.println("--------------");
+		ArrayList<String> neighbor=t.nearNeighborSearch("aaaaa", 2);
+		for(String s:neighbor)
+			System.out.println(s);
+	}
+	
+}

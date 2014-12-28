@@ -1,0 +1,60 @@
+/*
+  quadtree divides the 2-d plane to a four parts and the intersection is the point.
+  Mainly need to implement two methods: insert and query
+  query finds all the points in the range 
+  insert adds more nodes to the tree;
+  
+*/
+public class QuadTree{
+	static class QuadNode{
+		int x,y;
+		//V value;
+		QuadNode bottomLeft,bottomRight,topLeft,topRight;
+		public QuadNode(int x, int y){
+			this.x=x;this.y=y;
+		}
+	}
+	private QuadNode root;
+	
+	public void insert(int x, int y){
+		root = insert(root,x,y);	
+	}
+	private QuadNode insert(QuadNode root, int x, int y){
+		if(root==null){
+			return new QuadNode(x,y);
+		}
+		if(x>=root.x&&y>=root.y) root.topRight= insert(root.topRight,x,y);
+		if(x>=root.x&&y<root.y) root.bottomRight=insert(root.bottomRight,x,y);
+		if(x<root.x&&y>=root.y) root.topLeft=insert(root.topLeft,x,y);
+		if(x<root.x&&y<root.y) root.bottomLeft=insert(root.bottomLeft,x,y);
+		return root;
+	}
+	static class Rect{
+		QuadNode topRight;
+		QuadNode bottomLeft;
+		public Rect(int urX, int urY, int blX, int blY){
+			topRight=new QuadNode(urX,urY);
+			bottomLeft=new QuadNode(blX,blY);
+		}
+	}
+	public ArrayList<QuadNode> query(Rect range){
+		ArrayList<QuadNode> ret = new ArrayList<QuadNode>();
+		query(root,range,ret);
+		return ret;
+	}
+	private void query(QuadNode root, Rect range, ArrayList<QuadNode> col){
+		if(root==null)
+			return;
+		if(root.x>=range.bottomLeft.x&&root.y>=range.bottomLeft.y&&
+			root.x<=range.topRight.x&&root.y<=range.topRight.y)
+			col.add(root);
+		if(root.bottomLeft.x>=range.bottomLeft.x&&root.bottomLeft.y>=range.bottomLeft.y)
+			query(root.bottomLeft,range,col);
+		if(root.topRight.x<=range.topRight.x&&root.topRight.y<=range.topRight.y)
+			query(root.topRight,range,col);
+		if(root.bottomRight.x<=range.topRight.x&&root.bottomRight.y>=range.bottomLeft.y)
+			query(root.bottomLeft,range,col);
+		if(root.topLeft.x>=range.bottomLeft.x&&root.topLeft.y<=range.topRight.y)
+			query(root.bottomLeft,range,col);
+	}
+}

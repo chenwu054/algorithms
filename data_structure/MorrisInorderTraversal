@@ -1,0 +1,38 @@
+/*
+  Morris Traversal;
+  Inorder traverse the tree without using stack or recursion.
+  The idea is to use threaded binary tree and connect the right pointer of the last node(right most child of the 
+  left subtree) to the root.
+  It will encounter the root(with left subtree) twice, first time connect the thread and cut off the thread at the second 
+  time.
+*/
+public static void morrisTraversal(TreeNode root){
+	TreeNode cur=root,prev=null;
+	while(cur!=null){
+		//output the nodes with no left child
+		if(cur.left==null){
+			System.out.print(cur.val+" ");
+			cur=cur.right;
+		}
+		else{
+			prev=cur.left;
+			while(prev.right!=null&&prev.right!=cur)
+				prev=prev.right;
+			//first time to encounter the root, build the thread.
+			if(prev.right==null){
+				prev.right=cur;
+				cur=cur.left;
+			}
+			/*at the root again;
+				need to cut off the thread and output the 
+				root (with left child)
+			*/
+			else{
+				prev.right=null;
+				System.out.print(cur.val+" ");
+				cur=cur.right;
+			}
+		}
+	}	
+	
+}

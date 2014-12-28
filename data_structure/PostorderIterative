@@ -1,0 +1,66 @@
+public class PostorderTraversal {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		TreeNode node1=new TreeNode(1);
+		TreeNode node2=new TreeNode(2);
+		TreeNode node3=new TreeNode(3);
+		TreeNode node4=new TreeNode(4);
+		TreeNode node5=new TreeNode(5);
+		TreeNode node6=new TreeNode(6);
+		TreeNode node7=new TreeNode(7);
+		node4.left=node2;node4.right=node7;
+		node2.left=node1;node2.right=node3;
+		node7.left=node5;node5.right=node6;
+		PostorderTraversal p = new PostorderTraversal(node4);
+		TreeNode ret=null;
+		while(true){
+			ret=p.next();
+			if(ret==null)
+				break;
+			System.out.print(ret.val+" ");
+		}
+	}
+	static class TreeNode{
+		int val;
+		TreeNode left,right;
+		public TreeNode(int v){
+			this.val=v;
+			left=null;right=null;
+		}
+	}
+	TreeNode root;
+	Stack<TreeNode>parent;
+	public PostorderTraversal(TreeNode root){
+		this.root=root;
+		parent=new Stack<TreeNode>();
+		parent.push(root);
+		//since postorder is left, right,root,therefore, push left children first and when there is no left child
+		//push right child.
+		while(parent.peek().left!=null||parent.peek().right!=null){
+			if(parent.peek().left!=null)
+				parent.push(parent.peek().left);
+			else
+				parent.push(parent.peek().right);
+		}
+	}
+	public TreeNode next(){
+		if(parent.size()==0)
+			return null;
+		TreeNode ret=parent.pop();
+		if(parent.size()>0 && ret==parent.peek().left && parent.peek().right!=null){
+		//last time only the left child was pushed onto stack.therefore push right child this time.
+			parent.push(parent.peek().right);
+			while(parent.peek().left!=null || parent.peek().right!=null){
+				if(parent.peek().left!=null)
+					parent.push(parent.peek().left);
+				else
+					parent.push(parent.peek().right);
+			}
+		}
+		return ret;
+	}
+}

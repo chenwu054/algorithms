@@ -1,0 +1,136 @@
+public class SkipNode{
+	Integer key;
+	String val;
+	//int val;
+	ArrayList<SkipNode> next;
+	ArrayList<SkipNode> prev;
+	int height;
+	public SkipNode(Integer key,String val){
+		this.key=key;
+		this.val=val;
+		next=new ArrayList<SkipNode>();
+		prev=new ArrayList<SkipNode>();
+		height=1;
+	}
+}
+//*************************
+
+public class SkipList {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		SkipList sl = new SkipList();
+		sl.put(5,"5");
+		sl.put(3,"3");
+		sl.put(4,"4");
+		sl.put(10,"10");
+		sl.put(12,"12");
+		sl.put(9,"9");
+		System.out.println(sl.get(9));
+		//sl.iterate();
+		System.out.println();
+		sl.remove(4);
+		sl.remove(5);
+		sl.remove(10);
+		sl.remove(3);
+		sl.remove(9);
+		sl.remove(12);sl.iterate();
+		
+	}
+	SkipNode head,tail;
+	int height;
+	Random r;
+	public SkipList(){
+		head=new SkipNode(null,"");
+		tail=new SkipNode(null,"");
+		height=1;
+		head.next.add(tail);
+		tail.prev.add(head);
+		r=new Random();
+	}
+	public String get(Integer key){
+		SkipNode ret = get(key,0);
+		
+		return ret.key==key?ret.val:null;
+		
+	}
+	private SkipNode get(Integer key, int dummy){
+		int i=head.height-1;
+		SkipNode node=head;
+		while(i>=0){
+			if(node.next.get(i).key==null||node.next.get(i).key>key)
+				i--;
+			else if(node.next.get(i).key==key){
+				return node.next.get(i);
+			}
+			else
+				node=node.next.get(i);
+		}
+		return node;
+	}
+	public void put(Integer key, String val){
+		SkipNode old=get(key,0);
+		if(old.key==key){
+			old.val=val;
+			return;
+		}
+		//insert a new node at the bottom level;
+		SkipNode newNode = new SkipNode(key,val);
+		newNode.next.add(old.next.get(0));
+		old.next.get(0).prev.set(0,newNode);
+		newNode.prev.add(old);
+		old.next.set(0,newNode);
+		
+		while((r.nextInt()&1)>0){
+			newNode.height++;
+			if(newNode.height>height){
+				head.next.add(newNode);
+				newNode.next.add(tail);
+				tail.prev.add(newNode);
+				newNode.prev.add(head);
+				height++;
+				head.height++;
+				tail.height++;
+			}
+			else{
+				while(old.height<newNode.height)
+					old=old.prev.get(newNode.height-2);
+				newNode.next.add(old.next.get(newNode.height-1));
+				newNode.next.get(newNode.height-1).prev.set(newNode.height-1,newNode);
+				newNode.prev.add(old);
+				old.next.set(newNode.height-1,newNode);
+			}
+		}
+	}
+	public SkipNode remove(int key){
+		SkipNode d = get(key,0);
+		if(d.key!=key)
+			return null;
+		for(int i=d.height-1;i>=0;i--){
+			SkipNode last = d.prev.get(i);
+			SkipNode next = d.next.get(i);
+			last.next.set(i,next);
+			next.prev.set(i,last);
+			if(last==head && next==tail && i>0){
+				head.next.remove(i);
+				tail.prev.remove(i);
+				height--;
+				head.height--;
+				tail.height--;
+			}
+		}
+		d.next.clear();
+		d.prev.clear();
+		return d;
+	}
+	public void iterate(){
+		SkipNode node=head;
+		while(node!=tail){
+			System.out.println(node.key+" -> "+node.val+" : "+node.height);
+			node=node.next.get(0);
+		}
+	}
+}

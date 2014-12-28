@@ -1,0 +1,67 @@
+/*
+  Binary indexed tree is good for the consecutive sum in an array from index 0 to i;
+  Building the tree takes O(nlogn) time and each search takes O(lgn) in comparison with summing all the cells
+  from 0 to i, which takes O(n)time.
+  The following includes 1. building the auxiliary array "bit" 2. search for the sum from i to j 
+  3. update cell i to a given value.
+  Note : to get the last 1 in a binary representation: x=x&-x
+*/
+public class BinaryIndexedTree {
+	public int[] array;
+	public int[] bit;//auxiliary array
+	public BinaryIndexedTree(int[] a){
+		this.array=a;
+		this.bit=new int[a.length+1];
+		int length=a.length;
+		//constructing the binary indexed tree takes O(nlgn) time
+		for(int i=1;i<=length;i++){
+			int index=i;
+			while(index<=a.length){
+				bit[index]+=a[i-1];
+				index +=index&-index;
+			}
+		}
+	}
+	//return value from 0 to index;
+	//convert from 0-based index to 1-based 
+	public int readSum(int index){
+		int sum=0;
+		while(index>0){
+			sum+=bit[index];
+			index-=index & -index;
+		}
+		return sum;
+	}
+	// start and end are 0-based, need to convert to 1-based in our "bit" array
+	public int readSum(int start, int end){
+		return readSum(end+1)-readSum(start);
+	}
+	//index
+	public void update(int index, int value){
+		if(index>=bit.length)
+			return;
+		int diff=value-array[index];
+		array[index]=value;
+		index++;
+		while(index<bit.length){
+			bit[index]+=diff;
+			index += index&(-index);
+		}
+	}
+	public static void main(String[] args) {
+		int[] a= {1,2,3,4,5,6,7,8,9,10};
+		BinaryIndexedTree bit = new BinaryIndexedTree(a);
+		for(int i=0;i<=a.length;i++){
+			System.out.print(" "+bit.readSum(i));
+			//System.out.println(bit.bit[i]);
+		}
+		bit.update(5,0);
+		System.out.println();
+		for(int i=0;i<=a.length;i++){
+			System.out.print(" "+bit.readSum(i));
+			//System.out.println(bit.bit[i]);
+		}
+		System.out.println();
+		System.out.println(bit.readSum(3,6));
+	}
+}

@@ -1,0 +1,85 @@
+/*
+	basic data structure has start and end, and an auxiliary data field.
+	In this case it is max;
+	This segment tree does not do balancing.
+	Ideally, balanced Segment tree has lgN+R query time.
+*/
+
+class SegmentNode{
+	int start,end;
+	int max;
+	SegmentNode left,right;
+	public SegmentNode(int s,int e){
+		start=s;
+		end=e;
+		left=null;
+		right=null;
+		max=e;
+	}	
+}
+public class SegmentTree{
+	SegmentNode root;
+	public SegmentTree(){}
+
+	public void insert(int start, int end){
+		if(start>=end)
+			return;
+		if(root==null){
+			root=new SegmentNode(start,end);
+			return;
+		}
+		insert(root.start>start?root.left,root.right,start,end);
+	}
+	public SegmentNode insert(SegmentNode root, int start, int end){
+		if(root==null){
+			SegmentNode newNode =new SegmentNode(start,end);
+			return newNode;
+		}
+		if(root.start==start){
+			root.end=Math.max(end,root.end);
+			root.max=Math.max(root.max,end);
+		}
+		else if(root.start>start){
+			root.left=insert(root.left,start,end);
+			root.max=Math.max(root.max,root.left.max);
+		}
+		else{
+			root.right=insert(root.right,start,end);
+			root.max=Math.max(root.max,root.right.max);
+		}
+		return root;
+	}
+	//return all the nodes that contains q
+	public ArrayList<SegmentNode> query(int q){
+		ArrayList<SegmentNode> list = new ArrayList<SegmentNode>();
+		query(root,q,list);
+		return list;
+	}
+	private void query(SegmentNode root, int q,ArrayList<SegmentNode> list){
+		if(root==null)
+			return;
+		if(root.max<q)
+			return;
+		if(q>=root.start&&q<=root.end)
+			list.add(root);
+			query(root.left,q,list);
+			query(root.right,q,list);
+	}
+	//return all the nodes that intersect with start and end
+	public ArrayList<SegmentNode> query(int start, int end){
+		ArrayList<SegmentNode> list =new ArrayList<SegmentNode>();
+		query(root,start,end,list);
+		return list;
+	}
+	private void query(SegmentNode root, int start, int end, ArrayList<SegmentNode>list){
+		if(root==null)
+			return;
+		if(root.max<start)
+			return;
+		if((root.start<=start&&root.end>=start)||(root.end>=end&&root.start<=end))
+			list.add(root);
+			query(root.left,start,end,list);
+			query(root.right,start,end,list);
+	}
+
+}

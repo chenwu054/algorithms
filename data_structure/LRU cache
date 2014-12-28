@@ -1,0 +1,100 @@
+/*
+least recently used cache:
+main idea is the doubly linked list and hashmap. insert takes O(1) and get O(1);
+*/
+public class LRUCache<K,V> {
+	static class DoubleListNode<V>{
+		V val;
+		DoubleListNode<V> prev,next;
+		public DoubleListNode(V v){
+			this.val=v;
+			prev=null;next=null;
+		}
+		public DoubleListNode(){
+			this.prev=null;this.next=null;
+		}
+	}
+	
+	DoubleListNode<V> head,tail;
+	HashMap<K,DoubleListNode<V>>map;
+	int capacity;
+	int length;
+	public LRUCache(int size){
+		this.capacity=size;
+		head=new DoubleListNode<V>();
+		tail=new DoubleListNode<V>();
+		head.next=tail;
+		tail.prev=head;
+		map=new HashMap<K,DoubleListNode<V>>();
+	}
+	public void put(K key, V value){
+		DoubleListNode<V> node=null;
+		//don't forget both next and prev and put it into map
+		if(!map.containsKey(key)){
+			node=new DoubleListNode<V>(value);
+			map.put(key,node);
+			node.next=head.next;
+			head.next.prev=node;
+			head.next=node;
+			node.prev=head;
+			length++;
+			if(length>capacity){
+				DoubleListNode<V> last=tail.prev;
+				last.prev.next=tail;
+				tail.prev=last.prev;
+				last.next=null;
+				last.prev=null;
+				length--;
+			}
+		}
+		else{
+			node=map.get(key);
+			node.prev.next=node.next;
+			node.next.prev=node.prev;
+			node.next=head.next;
+			node.prev=head;
+			head.next=node;
+			node.val=value;
+		}
+		
+	}
+	public V get(K key){
+		DoubleListNode<V> node = map.get(key);
+		if(node==null)
+			return null;
+		node.prev.next=node.next;
+		node.next.prev=node.prev;
+		node.next=head.next;
+		head.next=node;
+		node.prev=head;
+		return node.val;
+	}
+	public void iterate(){
+		DoubleListNode<V> node =head.next;
+		while(node!=tail){
+			System.out.print(node.val+" ");
+			node=node.next;
+		}
+		System.out.println();
+	}
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		LRUCache<Integer,Integer> cache=new LRUCache<Integer,Integer>(5);
+		cache.put(1, 11);
+		cache.iterate();
+		cache.put(2, 22);
+		cache.iterate();
+		cache.put(3, 33);
+		cache.iterate();
+		cache.put(4, 44);
+		cache.iterate();
+		cache.put(5, 55);
+		cache.iterate();
+		cache.put(6, 66);
+		cache.iterate();
+		cache.put(3, 34);
+		cache.iterate();
+		cache.get(5);
+		cache.iterate();
+	}
+}
