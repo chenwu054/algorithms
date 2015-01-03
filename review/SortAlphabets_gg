@@ -1,0 +1,49 @@
+/*
+  给你一个按字母顺序排号的字典（但你不知道字母顺序，非英语）要求找出字母顺序。
+  wrt
+  wrf
+  er
+  ett
+  rftt
+  字母顺序是: w e r t f
+*/
+
+public ArrayList<Character> sortLetters(String[] arr){
+    int n = arr.length;
+    //build graph -> map
+    HashMap<Character,HashSet<Character>> map = new HashMap<Character,HashSet<Character>>();
+    for(int i=1;i<n;i++){
+        int j=0;
+        while(j< Math.min(arr[i].length(),arr[i-1].length()) && arr[i].charAt(j)==arr[i-1].charAt(j)){
+            j++;
+        }
+        if(j<Math.min(arr[i].length(),arr[i-1].length())){
+            char c = arr[i].charAt(j);
+            if(!map.containsKey(c)){
+                map.put(c,new HashSet<Character>());
+            }
+            map.get(c).add(arr[i-1].charAt(j));
+        }
+    }
+    //toposort using dfs
+    HashSet<Character> visited = new HashSet<Character>();
+    HashSet<Character> sortedSet = new HashSet<Character>();
+    ArrayList<Character> sorted= new ArrayList<Character>();
+    for(Character c : map.keySet()){
+        dfs(map,c,visited,sortedSet,sorted);
+    }
+    return sorted;
+}
+public void dfs(HashMap<Character,HashSet<Character>>map , Character c, HashSet<Character>visited,HashSet<Character>sortedSet,ArrayList<Character>sorted){
+    if(visited.contains(c) || sortedSet.contains(c))
+        return;
+    visited.add(c);
+    HashSet<Character> prevSet = map.get(c);
+    for(Character prev : prevSet){
+        dfs(map,prev,visited,sortedSet,sorted);
+    }
+    sortedSet.add(c);
+    sorted.add(c);
+    visited.remove(c);
+}
+
